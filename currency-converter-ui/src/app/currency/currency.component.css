@@ -1,0 +1,22 @@
+.content {
+    /* display: flex; */
+    justify-content: center;
+    align-items: center;
+}
+
+.content-align {
+    text-align: center;
+}
+
+.element-margin {
+    margin: 2%;
+}
+
+.header-style {
+    background-color: #673ab7;
+    color: white;
+}
+
+.main-content {
+    margin-top: 5rem;
+}

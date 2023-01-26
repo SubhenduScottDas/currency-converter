@@ -3,9 +3,11 @@ const dotenv = require("dotenv").config();
 // const cron = require("node-cron");
 const { EXCHANGE_KEY } = process.env;
 const app = express();
+const cors = require("cors");
 let symbol = require("./model/symbol");
 // let exchangeRate = require("./model/exchangeRate");
 
+app.use(cors());
 var myHeaders = new Headers();
 myHeaders.append("apikey", process.env.KEY || EXCHANGE_KEY);
 
@@ -18,8 +20,19 @@ var requestOptions = {
 fetch("https://api.apilayer.com/exchangerates_data/symbols", requestOptions)
   .then((response) => response.text())
   .then((result) => {
-    symbol = result;
-    console.log(result);
+    result = JSON.parse(result);
+    if (result["success"] == true) {
+      let sym = Object.keys(result["symbols"]).sort();
+      let symbolArr = [];
+      for (let i = 0; i < sym.length; i++) {
+        symbolArr.push({
+          symbol: sym[i],
+          denomination: result.symbols[sym[i]],
+        });
+      }
+      symbol = symbolArr;
+    }
+    console.log(symbol);
   })
   .catch((error) => console.log("error", error));
 
@@ -42,7 +55,7 @@ app.get("/currency", async (req, res) => {
   res.send(symbol);
 });
 
-app.get("/convert", async (req, res) => {
+app.post("/convert", async (req, res) => {
   let to = req.body.to;
   let from = req.body.from;
   let amount = req.body.amount;
@@ -52,8 +65,18 @@ app.get("/convert", async (req, res) => {
   )
     .then((response) => response.text())
     .then((result) => {
-      console.log(result);
-      res.send(result);
+      result = JSON.parse(result);
+      if (result["success"] == true) {
+        console.log(result);
+        res.send({
+          to: to,
+          from: from,
+          amount: amount,
+          rate: result["info"]["rate"],
+          date: result["date"],
+          result: result["result"],
+        });
+      }
     })
     .catch((error) => console.log("error", error));
 });
