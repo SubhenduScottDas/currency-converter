@@ -3,7 +3,7 @@
 </div>>
 
 <div class="content main-content">
-  <form>
+  <form [formGroup]="exchangeForm" (ngSubmit)="onSubmit()">
     <div class="content-align">
       <mat-form-field appearance="fill" class="element-margin">
         <mat-label>Base Currency</mat-label>
@@ -18,7 +18,7 @@
       </mat-form-field>
       <mat-form-field appearance="fill" class="element-margin">
         <mat-label>Enter Amount</mat-label>
-        <input matInput>
+        <input type="number" formControlName="amount" matInput required>
       </mat-form-field>
     </div>
 
@@ -38,13 +38,13 @@
 
     <div class="content-align" *ngIf="isExchanged">
       <mat-card>
-        <mat-card-content>EXCHANGED VALUE: {{exchanged}}</mat-card-content>
+        <mat-card-content>{{responseStr}}<br><h2>{{resultCash}}</h2></mat-card-content>
       </mat-card>
     </div>
 
     <div class="content-align">
-      <button mat-raised-button color="primary" class="element-margin">Convert</button>
-      <button mat-raised-button color="accent" class="element-margin">Reset</button>
+      <button mat-raised-button color="primary" class="element-margin" type="submit">Convert</button>
+      <button mat-raised-button color="accent" class="element-margin" type="reset">Reset</button>
     </div>
   </form>
 </div>
