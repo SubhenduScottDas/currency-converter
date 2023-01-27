@@ -25,6 +25,8 @@ export class CurrencyComponent implements OnInit {
   responseStr: any;
   resultCash: any;
   amount: any;
+  fromCurrInitial: any;
+  toCurrInitial: any;
   exchangeForm = this.formBuilder.group({
     fromCurrencyControl: '',
     toCurrencyControl: '',
@@ -86,5 +88,7 @@ export class CurrencyComponent implements OnInit {
 
   onReset(): void {
     this.isExchanged= false;
+    this.fromCurrInitial='';
+    this.toCurrInitial='';
   }
 }
