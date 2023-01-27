@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { CurrencyConvertService } from '../providers/currency-convert.service';
+import { Router } from '@angular/router';
 
 interface Currency {
   symbol: string;
@@ -12,7 +13,8 @@ interface Currency {
   templateUrl: './currency.component.html',
   styleUrls: ['./currency.component.css'],
 })
-export class CurrencyComponent {
+export class CurrencyComponent implements OnInit {
+  allCurrency: any;
   fromCurrency: any;
   toCurrency: any;
   fromCurrencyControl: any;
@@ -31,7 +33,8 @@ export class CurrencyComponent {
 
   constructor(
     public currencyConvertService: CurrencyConvertService,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    public router:Router
   ) {
     this.fromCurrency = [];
     this.toCurrency = [];
@@ -50,6 +53,7 @@ export class CurrencyComponent {
     this.selectFormControl = new FormControl('', Validators.required);
     this.currencyConvertService.getSymbols().subscribe((response: any) => {
       console.log(response);
+      this.allCurrency = [...response];
       this.fromCurrency = [...response];
       this.toCurrency = [...response];
     });
@@ -81,6 +85,6 @@ export class CurrencyComponent {
   }
 
   onReset(): void {
-    this.exchangeForm.reset();
+    this.isExchanged= false;
   }
 }
