@@ -9,14 +9,19 @@
 }
 
 .element-margin {
-    margin: 2%;
+    margin: 1rem;
 }
 
 .header-style {
     background-color: #673ab7;
     color: white;
+    height: 3rem;
+}
+
+.header-title {
+    padding-top: 0.5rem;
 }
 
 .main-content {
-    margin-top: 5rem;
+    margin-top: 8rem;
 }
