@@ -4,8 +4,8 @@ const dotenv = require("dotenv").config();
 const { EXCHANGE_KEY } = process.env;
 const app = express();
 const cors = require("cors");
-let symbol = require("./model/symbol");
-// let exchangeRate = require("./model/exchangeRate");
+const symbol = require("./model/symbol");
+const exchangeRate = require("./model/exchangeRate");
 
 app.use(cors());
 var myHeaders = new Headers();
@@ -17,6 +17,7 @@ var requestOptions = {
   headers: myHeaders,
 };
 
+//ADD CRON JOB TO UPDATE SYMBOLS TO DB ONCE EVERY DAY. REDUCES CALLS TO API TO MAX 31 PER MONTH//
 fetch("https://api.apilayer.com/exchangerates_data/symbols", requestOptions)
   .then((response) => response.text())
   .then((result) => {
@@ -31,9 +32,19 @@ fetch("https://api.apilayer.com/exchangerates_data/symbols", requestOptions)
           denomination: result.symbols[sym[i]],
         });
       }
-      symbol = symbolArr;
+      symbol
+        .deleteMany({})
+        .then(() => {
+          symbol.insertMany(symbolArr, function (error) {
+            if (error) console.log(error);
+            else {
+              console.log("Symbols Created");
+              console.log(symbolArr);
+            }
+          });
+        })
+        .catch((error) => console.log("error", error));
     }
-    console.log(symbol);
   })
   .catch((error) => console.log("error", error));
 
@@ -53,7 +64,14 @@ app.get("/welcome", async (req, res) => {
 });
 
 app.get("/currency", async (req, res) => {
-  res.send(symbol);
+  symbol
+    .find({})
+    .then((result) => {
+      res.send(result);
+    })
+    .catch((err) => {
+      console.log("error", error);
+    });
 });
 
 app.post("/convert", async (req, res) => {
@@ -68,18 +86,64 @@ app.post("/convert", async (req, res) => {
     .then((result) => {
       result = JSON.parse(result);
       if (result["success"] == true) {
-        console.log(result);
-        res.send({
+        console.log("FROM API EXT:", result);
+        let responseObj = {
           to: to,
           from: from,
           amount: amount,
           rate: result["info"]["rate"],
           date: result["date"],
           result: result["result"],
-        });
+        };
+        let updateObj = {
+          to: to,
+          from: from,
+          rate: result["info"]["rate"],
+          date: result["date"],
+        };
+        exchangeRate
+          .findOne({ to: to, from: from })
+          .then((resp) => {
+            if (resp == null) {
+              exchangeRate
+                .create(updateObj)
+                .then((result) => {
+                  console.log(result);
+                })
+                .catch((err) => {
+                  console.log(err);
+                });
+            } else {
+              exchangeRate
+                .updateOne(updateObj)
+                .then((result) => {
+                  console.log(result);
+                })
+                .catch((err) => {
+                  console.log(err);
+                });
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+
+        res.send(responseObj);
       }
     })
-    .catch((error) => console.log("error", error));
+    .catch((error) => {
+      exchangeRate
+        .findOne({ to: to, from: from })
+        .then((resp) => {
+          resp = { amount: amount, result: amount * resp["rate"], ...resp };
+          console.log("error", error);
+          console.log(resp);
+          res.send(resp);
+        })
+        .catch((error) => {
+          console.log("error", error);
+        });
+    });
 });
 
 module.exports = app;
