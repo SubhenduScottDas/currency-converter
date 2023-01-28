@@ -27,6 +27,7 @@ export class CurrencyComponent implements OnInit {
   amount: any;
   fromCurrInitial: any;
   toCurrInitial: any;
+  dateStr: any;
   exchangeForm = this.formBuilder.group({
     fromCurrencyControl: '',
     toCurrencyControl: '',
@@ -75,8 +76,9 @@ export class CurrencyComponent implements OnInit {
       .subscribe((response: any) => {
         this.isExchanged = true;
         this.exchanged = response;
-        this. responseStr = `EXCHANGE RATE: ${this.fromCurrencyControl.value.symbol}(${this.fromCurrencyControl.value.denomination}) 1.00 = ${this.toCurrencyControl.value.symbol}(${this.toCurrencyControl.value.denomination}) ${this.exchanged.rate}`
-        this.resultCash = `${this.toCurrencyControl.value.symbol} ${this.exchanged.result}`
+        this. responseStr = `EXCHANGE RATE: ${this.fromCurrencyControl.value.symbol}(${this.fromCurrencyControl.value.denomination}) 1.00 = ${this.toCurrencyControl.value.symbol}(${this.toCurrencyControl.value.denomination}) ${this.exchanged.rate}`;
+        this.resultCash = `${this.toCurrencyControl.value.symbol} ${this.exchanged.result}`;
+        this.dateStr = `Exchage rate in accordance to the one published on ${this.exchanged.date}`;
         console.log('EXCHANGE:', response);
       });
     }

@@ -20,6 +20,7 @@ var requestOptions = {
 fetch("https://api.apilayer.com/exchangerates_data/symbols", requestOptions)
   .then((response) => response.text())
   .then((result) => {
+    console.log(result);
     result = JSON.parse(result);
     if (result["success"] == true) {
       let sym = Object.keys(result["symbols"]).sort();
