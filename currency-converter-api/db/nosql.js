@@ -6,3 +6,5 @@ exports.connect = () => {
     .then(() => console.log("Connected to MongoDB"))
     .catch((err) => console.log("Error Connecting to Database... ", err));
 }
+
+//Create and execute checkconnecion for fault tolerance
